@@ -1,0 +1,653 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Liquidador de Nomina Colombia 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',Arial,sans-serif;background:#EAEDED;color:#0F1111;min-height:100vh;}
+.hdr{background:#131921;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-ic{width:36px;height:36px;background:#FF9900;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#131921;}
+.logo-tx{color:#fff;font-size:17px;font-weight:700;}
+.logo-tx span{color:#FF9900;}
+.hdr-r{font-size:12px;color:#aaa;}
+.nav{background:#232F3E;padding:0 16px;display:flex;gap:0;overflow-x:auto;}
+.nb{background:transparent;border:none;color:#ddd;font-family:'Inter',Arial,sans-serif;font-size:13.5px;font-weight:500;padding:12px 18px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;}
+.nb:hover{color:#fff;background:#37475A;}
+.nb.on{color:#fff;border-bottom:3px solid #FF9900;}
+.pg{max-width:1120px;margin:0 auto;padding:22px 20px 60px;}
+.card{background:#fff;border:1px solid #DDD;border-radius:8px;padding:22px 24px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+.card h3{font-size:17px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #DDD;}
+.row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+.fld{display:flex;flex-direction:column;gap:5px;flex:1;min-width:150px;}
+.fld label{font-size:13px;font-weight:600;color:#0F1111;}
+.fld input,.fld select{font-family:'Inter',Arial,sans-serif;font-size:14px;padding:9px 12px;border:1px solid #999;border-radius:6px;background:#fff;color:#0F1111;outline:none;width:100%;}
+.fld input:focus,.fld select:focus{border-color:#FF9900;box-shadow:0 0 0 3px rgba(255,153,0,.25);}
+.btn{font-family:'Inter',Arial,sans-serif;font-size:13.5px;font-weight:600;padding:9px 20px;border-radius:20px;border:1px solid #E47911;background:linear-gradient(to bottom,#FFD814,#FF9900);color:#0F1111;cursor:pointer;}
+.btn:hover{background:linear-gradient(to bottom,#F7CA00,#E47911);}
+.btn.sec{background:linear-gradient(to bottom,#F7F8F8,#E7E9EC);border-color:#ADB1B8;color:#0F1111;}
+.btn.sec:hover{background:#D5D9D9;}
+.btn.dng{background:transparent;border:1px solid #B12704;color:#B12704;border-radius:6px;}
+.btn.dng:hover{background:#FFF0EF;}
+.btn.sm{font-size:12px;padding:6px 13px;}
+.bdg{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:600;}
+.ok{background:#EAF7F4;color:#067D62;}
+.wn{background:#FFF0EF;color:#B12704;}
+.inf{background:#EAF4F4;color:#007185;}
+.alr{border-radius:6px;padding:12px 16px;font-size:13.5px;line-height:1.6;margin-bottom:16px;border-left:4px solid;}
+.alr.or{background:#FFF3E0;border-color:#FF9900;color:#7A4300;}
+.alr.gr{background:#EAF7F4;border-color:#067D62;color:#04574A;}
+.alr.bl{background:#EAF4F4;border-color:#007185;color:#004B55;}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;}
+.tbl th{text-align:left;padding:10px 12px;background:#F0F2F2;border-bottom:2px solid #DDD;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#565959;}
+.tbl td{padding:11px 12px;border-bottom:1px solid #EAEDED;vertical-align:middle;}
+.tbl tr:hover td{background:#F7FAFA;}
+.nr{text-align:right;font-family:'Courier New',monospace;font-weight:600;}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
+.kcard{background:#fff;border:1px solid #DDD;border-radius:8px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+.kl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#565959;margin-bottom:6px;}
+.kv{font-size:22px;font-weight:700;font-family:'Courier New',monospace;}
+.ks{font-size:11px;color:#767676;margin-top:4px;}
+.chk{display:flex;align-items:center;gap:9px;font-size:13.5px;cursor:pointer;margin-top:10px;}
+.chk input{width:16px;height:16px;accent-color:#FF9900;}
+.mty{text-align:center;padding:50px 20px;color:#767676;}
+.mty .mi{font-size:48px;margin-bottom:12px;}
+.det{background:#F0F2F2;border-radius:6px;padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.dr{display:flex;justify-content:space-between;padding:5px 0;font-size:13.5px;border-bottom:1px solid #E3E6E6;}
+.dr:last-child{border-bottom:none;}
+.dl{color:#565959;}
+.dv{font-family:'Courier New',monospace;font-weight:600;}
+.step{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #DDD;}
+.snum{min-width:34px;height:34px;background:#FF9900;color:#0F1111;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;}
+.step h4{font-size:14.5px;font-weight:700;margin-bottom:5px;}
+.step p{font-size:13.5px;color:#565959;line-height:1.6;}
+.toast{position:fixed;bottom:20px;right:20px;background:#0F1111;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+.pitem{background:#F0F2F2;border-radius:6px;padding:12px 14px;}
+.pk{font-size:11px;font-weight:700;text-transform:uppercase;color:#565959;margin-bottom:4px;}
+.pv{font-size:16px;font-weight:700;font-family:'Courier New',monospace;}
+@media(max-width:640px){.pg{padding:14px 12px 50px;}.card{padding:16px;}.det{grid-template-columns:1fr;}.kgrid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo } = React;
+
+const SMMLV = 1750905;
+const AUX_T = 249095;
+const UVT   = 52374;
+const DIV_H = 240;
+
+const ARL = { I:0.00522, II:0.01044, III:0.02436, IV:0.0435, V:0.0696 };
+
+function fmt(n) {
+  return (isNaN(n) ? 0 : Math.round(n)).toLocaleString("es-CO", {
+    style:"currency", currency:"COP", maximumFractionDigits:0
+  });
+}
+function uid() { return Math.random().toString(36).slice(2,10); }
+
+const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
+               "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+function calcular(emp, entradasMes, exonerada) {
+  const sal = Number(emp.salario) || 0;
+  const vh  = sal / DIV_H;
+  let ed=0, en=0, rn=0, df=0, ausencias=0;
+  entradasMes.forEach(function(e) {
+    ed += (e.hed||0) * vh * 1.25;
+    en += (e.hen||0) * vh * 1.75;
+    rn += (e.rn ||0) * vh * 0.35;
+    df += (e.df ||0) * vh * 0.75;
+    if (e.ausente) ausencias++;
+  });
+  var descAus = ausencias * (sal/30);
+  var auxT    = sal <= SMMLV*2 ? AUX_T : 0;
+  var extras  = ed + en + rn + df;
+  var deveng  = sal - descAus + extras + auxT;
+  var ibc     = Math.max(sal - descAus + extras, SMMLV);
+  var salEmp  = ibc * 0.04;
+  var penEmp  = ibc * 0.04;
+  var neto    = deveng - salEmp - penEmp;
+  var baseUVT = (deveng - salEmp - penEmp - deveng*0.25) / UVT;
+  var retener = baseUVT > 95;
+  var xon     = exonerada && sal < SMMLV*10;
+  var salEer  = xon ? 0 : ibc*0.085;
+  var penEer  = ibc * 0.12;
+  var arlC    = ibc * (ARL[emp.claseRiesgo||"I"] || ARL.I);
+  var caja    = ibc * 0.04;
+  var sena    = xon ? 0 : ibc*0.02;
+  var icbf    = xon ? 0 : ibc*0.03;
+  var pCes    = (sal+auxT)*0.0833;
+  var pICes   = pCes*0.12;
+  var pPrima  = sal*0.0833;
+  var pVac    = sal*0.0417;
+  var costoTotal = deveng+salEer+penEer+arlC+caja+sena+icbf+pCes+pICes+pPrima+pVac;
+  return {sal,auxT,ed,en,rn,df,descAus,ausencias,deveng,salEmp,penEmp,neto,retener,
+          salEer,penEer,arlC,caja,sena,icbf,pCes,pICes,pPrima,pVac,costoTotal,xon};
+}
+
+const SK = "nomina-co-2026-v2";
+function cargar() {
+  try { var r=localStorage.getItem(SK); if(r) return JSON.parse(r); } catch(e){}
+  return null;
+}
+function guardar(d) {
+  try { localStorage.setItem(SK,JSON.stringify(d)); return true; } catch(e){ return false; }
+}
+
+function App() {
+  var ini = cargar();
+  var _t  = useState("empleados");    var tab=_t[0], setTab=_t[1];
+  var _e  = useState(ini&&ini.emps||[]); var emps=_e[0], setEmps=_e[1];
+  var _en = useState(ini&&ini.ents||[]); var ents=_en[0], setEnts=_en[1];
+  var _x  = useState(ini!=null ? ini.xon : true); var xon=_x[0], setXon=_x[1];
+  var _to = useState(""); var toast=_to[0], setToast=_to[1];
+
+  useEffect(function() {
+    var t = setTimeout(function() {
+      var ok = guardar({emps:emps, ents:ents, xon:xon});
+      setToast(ok ? "Guardado" : "Error al guardar");
+      setTimeout(function(){ setToast(""); }, 1800);
+    }, 500);
+    return function(){ clearTimeout(t); };
+  }, [emps, ents, xon]);
+
+  function exportar() {
+    var d = {emps:emps, ents:ents, xon:xon, ts:new Date().toISOString()};
+    var b = new Blob([JSON.stringify(d,null,2)], {type:"application/json"});
+    var u = URL.createObjectURL(b);
+    var a = document.createElement("a");
+    a.href=u; a.download="nomina-"+new Date().toISOString().slice(0,10)+".json"; a.click();
+    URL.revokeObjectURL(u);
+  }
+  function importar(e) {
+    var f=e.target.files[0]; if(!f) return;
+    var r=new FileReader();
+    r.onload=function(ev){
+      try {
+        var d=JSON.parse(ev.target.result);
+        setEmps(d.emps||[]); setEnts(d.ents||[]); setXon(d.xon!=null?d.xon:true);
+      } catch(_){ alert("Archivo no valido."); }
+    };
+    r.readAsText(f);
+  }
+
+  var TABS=[["empleados","Empleados"],["horas","Registro de horas"],
+            ["liquidacion","Liquidar nomina"],["respaldo","Respaldo"],["guia","Guia"]];
+
+  return (
+    <div>
+      <header className="hdr">
+        <div className="logo">
+          <div className="logo-ic">N</div>
+          <div className="logo-tx">Nomina<span>Colombia</span></div>
+        </div>
+        <div className="hdr-r">Colombia 2026 - SMMLV $1.750.905</div>
+      </header>
+      <nav className="nav">
+        {TABS.map(function(item){
+          return <button key={item[0]} className={"nb"+(tab===item[0]?" on":"")} onClick={function(){setTab(item[0]);}}>{item[1]}</button>;
+        })}
+      </nav>
+      <main className="pg">
+        {tab==="empleados"   && <TabEmpleados emps={emps} setEmps={setEmps} xon={xon} setXon={setXon}/>}
+        {tab==="horas"       && <TabHoras emps={emps} ents={ents} setEnts={setEnts}/>}
+        {tab==="liquidacion" && <TabLiq emps={emps} ents={ents} xon={xon}/>}
+        {tab==="respaldo"    && <TabResp onExp={exportar} onImp={importar} emps={emps} ents={ents}/>}
+        {tab==="guia"        && <TabGuia/>}
+      </main>
+      <div className={"toast"+(toast?" show":"")}>{toast}</div>
+    </div>
+  );
+}
+
+function TabEmpleados(props) {
+  var emps=props.emps, setEmps=props.setEmps, xon=props.xon, setXon=props.setXon;
+  var _f=useState(null); var form=_f[0], setForm=_f[1];
+  function nuevo(){ setForm({id:uid(),nombre:"",cedula:"",salario:"",claseRiesgo:"I",fechaIngreso:""}); }
+  function guardarEmp(){
+    if(!form.nombre.trim()||!form.salario) return;
+    setEmps(function(prev){
+      var existe=prev.some(function(x){return x.id===form.id;});
+      if(existe) return prev.map(function(x){return x.id===form.id?form:x;});
+      return prev.concat([form]);
+    });
+    setForm(null);
+  }
+  function eliminar(id){
+    if(confirm("Eliminar este empleado?")) setEmps(function(prev){return prev.filter(function(x){return x.id!==id;});});
+  }
+  var auxMsg = form && Number(form.salario)>0 ? (Number(form.salario)<=SMMLV*2 ? "Tiene derecho a auxilio de transporte ($249.095/mes)" : "No aplica auxilio de transporte (salario > 2 SMMLV)") : null;
+  return (
+    <div>
+      <div className="alr or">
+        <strong>Exoneracion Ley 1607:</strong> Tu empresa esta <strong>{xon?"marcada":"NO marcada"}</strong> como exonerada de aportes de salud empleador, SENA e ICBF para empleados que ganen menos de 10 SMMLV.
+        <label className="chk">
+          <input type="checkbox" checked={xon} onChange={function(e){setXon(e.target.checked);}}/>
+          Mi empresa aplica la exoneracion Ley 1607
+        </label>
+      </div>
+      <div className="card">
+        <h3>Empleados registrados</h3>
+        {emps.length===0 ? (
+          <div className="mty"><div className="mi">&#128101;</div><p>Aun no hay empleados. Haz clic en <strong>+ Agregar empleado</strong>.</p></div>
+        ) : (
+          <div style={{overflowX:"auto"}}>
+            <table className="tbl">
+              <thead><tr><th>Nombre</th><th>Cedula</th><th>ARL</th><th style={{textAlign:"right"}}>Salario</th><th>Ingreso</th><th></th></tr></thead>
+              <tbody>
+                {emps.map(function(e){
+                  return (
+                    <tr key={e.id}>
+                      <td><strong>{e.nombre}</strong></td>
+                      <td style={{color:"#565959"}}>{e.cedula||"—"}</td>
+                      <td><span className="bdg inf">Clase {e.claseRiesgo}</span></td>
+                      <td className="nr">{fmt(Number(e.salario))}</td>
+                      <td style={{color:"#565959",fontSize:13}}>{e.fechaIngreso||"—"}</td>
+                      <td>
+                        <div style={{display:"flex",gap:8}}>
+                          <button className="btn sec sm" onClick={function(){setForm(e);}}>Editar</button>
+                          <button className="btn dng sm" onClick={function(){eliminar(e.id);}}>Eliminar</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <div style={{marginTop:16}}><button className="btn" onClick={nuevo}>+ Agregar empleado</button></div>
+      </div>
+      {form && (
+        <div className="card">
+          <h3>{emps.some(function(e){return e.id===form.id;}) ? "Editar empleado" : "Nuevo empleado"}</h3>
+          <div className="row">
+            <div className="fld"><label>Nombre completo *</label><input value={form.nombre} onChange={function(e){setForm(Object.assign({},form,{nombre:e.target.value}));}} placeholder="Ej: Juan Perez"/></div>
+            <div className="fld"><label>Cedula</label><input value={form.cedula} onChange={function(e){setForm(Object.assign({},form,{cedula:e.target.value}));}} placeholder="Ej: 1020304050"/></div>
+          </div>
+          <div className="row">
+            <div className="fld"><label>Salario mensual (COP) *</label><input type="number" value={form.salario} onChange={function(e){setForm(Object.assign({},form,{salario:e.target.value}));}} placeholder="1750905"/></div>
+            <div className="fld">
+              <label>Clase de riesgo ARL</label>
+              <select value={form.claseRiesgo} onChange={function(e){setForm(Object.assign({},form,{claseRiesgo:e.target.value}));}}>
+                {["I","II","III","IV","V"].map(function(c){return <option key={c} value={c}>Clase {c}</option>;})}
+              </select>
+            </div>
+            <div className="fld"><label>Fecha de ingreso</label><input type="date" value={form.fechaIngreso} onChange={function(e){setForm(Object.assign({},form,{fechaIngreso:e.target.value}));}}/></div>
+          </div>
+          {auxMsg && <div className={"alr "+(Number(form.salario)<=SMMLV*2?"gr":"or")} style={{marginTop:0,marginBottom:12}}>{auxMsg}</div>}
+          <div style={{display:"flex",gap:10}}>
+            <button className="btn" onClick={guardarEmp}>Guardar</button>
+            <button className="btn sec" onClick={function(){setForm(null);}}>Cancelar</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================================================
+   DETECCION AUTOMATICA DE RECARGOS NOCTURNOS Y HORAS EXTRA
+   Normativa colombiana (CST):
+   - Diurno: 06:00 - 21:00
+   - Nocturno: 21:00 - 06:00  (+35% recargo ordinario)
+   - Extra diurna: horas sobre 8h en horario diurno (+25%)
+   - Extra nocturna: horas sobre 8h en horario nocturno (+75%)
+   ============================================================ */
+var INICIO_NOC = 21 * 60; // 1260 min
+var FIN_NOC    =  6 * 60; // 360 min
+var JORNADA_STD = 8 * 60; // 480 min
+
+function toMin(hora) {
+  var p = hora.split(":"); return parseInt(p[0])*60 + parseInt(p[1]);
+}
+function redondear2(n) { return Math.round(n * 100) / 100; }
+
+function esNocturno(minDesdeMedianoche) {
+  var t = ((minDesdeMedianoche % 1440) + 1440) % 1440;
+  return t >= INICIO_NOC || t < FIN_NOC;
+}
+
+function calcularNovedades(entrada, salida) {
+  if (!entrada || !salida) return null;
+  var minE = toMin(entrada);
+  var minS = toMin(salida);
+  if (minS <= minE) minS += 1440; // turno que cruza medianoche
+
+  var totalMin = minS - minE;
+  if (totalMin <= 0) return null;
+
+  // Clasificar cada minuto: ordinario diurno, ordinario nocturno,
+  // extra diurno, extra nocturno
+  var stdAcum = 0;
+  var ordDiur = 0, ordNoc = 0, extDiur = 0, extNoc = 0;
+
+  for (var t = minE; t < minS; t++) {
+    var noc = esNocturno(t);
+    if (stdAcum < JORNADA_STD) {
+      if (noc) ordNoc++; else ordDiur++;
+      stdAcum++;
+    } else {
+      if (noc) extNoc++; else extDiur++;
+    }
+  }
+
+  return {
+    totalHoras:     redondear2(totalMin / 60),
+    recargoNocturno: redondear2(ordNoc  / 60),
+    extraDiurna:     redondear2(extDiur / 60),
+    extraNocturna:   redondear2(extNoc  / 60),
+    horasOrdinarias: redondear2((ordDiur + ordNoc) / 60),
+  };
+}
+
+function TabHoras(props) {
+  var emps=props.emps, ents=props.ents, setEnts=props.setEnts;
+  var hoy=new Date().toISOString().slice(0,10);
+  var _id=useState(emps[0]?emps[0].id:""); var empId=_id[0], setEmpId=_id[1];
+  var _f=useState({fecha:hoy,entrada:"",salida:"",df:"",ausente:false});
+  var f=_f[0], setF=_f[1];
+  useEffect(function(){ if(!empId&&emps[0]) setEmpId(emps[0].id); }, [emps]);
+
+  if(emps.length===0) return (
+    <div className="mty"><div className="mi">&#9201;</div>
+    <p>Primero agrega empleados en la pestana <strong>Empleados</strong>.</p></div>
+  );
+
+  // Calcular novedades automaticamente
+  var auto = calcularNovedades(f.entrada, f.salida);
+
+  function agregar() {
+    if (!empId) return;
+    var hed = auto ? auto.extraDiurna  : 0;
+    var hen = auto ? auto.extraNocturna: 0;
+    var rn  = auto ? auto.recargoNocturno : 0;
+    setEnts(function(prev){
+      return prev.concat([{
+        id: uid(), empleadoId: empId, fecha: f.fecha,
+        entrada: f.entrada, salida: f.salida,
+        horasTrabajadas: auto ? auto.totalHoras : 0,
+        hed: hed, hen: hen, rn: rn,
+        df: Number(f.df)||0,
+        ausente: f.ausente
+      }]);
+    });
+    setF(Object.assign({},f,{entrada:"",salida:"",df:"",ausente:false}));
+  }
+
+  var eEmp=ents.filter(function(e){return e.empleadoId===empId;})
+               .sort(function(a,b){return a.fecha<b.fecha?1:-1;});
+  var nomEmp=(emps.find(function(e){return e.id===empId;})||{}).nombre||"";
+
+  return (
+    <div>
+      <div className="card">
+        <h3>Registrar novedad de tiempo</h3>
+
+        <div className="row">
+          <div className="fld">
+            <label>Empleado</label>
+            <select value={empId} onChange={function(e){setEmpId(e.target.value);}}>
+              {emps.map(function(e){return <option key={e.id} value={e.id}>{e.nombre}</option>;})}
+            </select>
+          </div>
+          <div className="fld">
+            <label>Fecha</label>
+            <input type="date" value={f.fecha} onChange={function(e){setF(Object.assign({},f,{fecha:e.target.value}));}}/>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="fld">
+            <label>Hora de entrada</label>
+            <input type="time" value={f.entrada} onChange={function(e){setF(Object.assign({},f,{entrada:e.target.value}));}}/>
+          </div>
+          <div className="fld">
+            <label>Hora de salida</label>
+            <input type="time" value={f.salida} onChange={function(e){setF(Object.assign({},f,{salida:e.target.value}));}}/>
+          </div>
+          <div className="fld">
+            <label>H. dominical/festivo <span style={{color:"#067D62",fontWeight:700}}>+75%</span></label>
+            <input type="number" min="0" step="0.5" value={f.df}
+              onChange={function(e){setF(Object.assign({},f,{df:e.target.value}));}} placeholder="0"/>
+          </div>
+        </div>
+
+        {auto && (
+          <div style={{background:"#F0F2F2",borderRadius:8,padding:"14px 18px",marginBottom:16,border:"1px solid #DDD"}}>
+            <div style={{fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:".5px",color:"#565959",marginBottom:10}}>
+              Calculo automatico segun normativa colombiana
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:10}}>
+              <div style={{background:"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid #DDD"}}>
+                <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>TOTAL TRABAJADO</div>
+                <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace"}}>{auto.totalHoras} h</div>
+              </div>
+              <div style={{background:"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid #DDD"}}>
+                <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>H. ORDINARIAS</div>
+                <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace"}}>{auto.horasOrdinarias} h</div>
+              </div>
+              <div style={{background: auto.recargoNocturno>0?"#EAF7F4":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.recargoNocturno>0?"#067D62":"#DDD")}}>
+                <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>REC. NOCTURNO +35%</div>
+                <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.recargoNocturno>0?"#067D62":"#0F1111"}}>
+                  {auto.recargoNocturno} h
+                </div>
+              </div>
+              <div style={{background:auto.extraDiurna>0?"#FFF3E0":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.extraDiurna>0?"#FF9900":"#DDD")}}>
+                <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>EXTRA DIURNA +25%</div>
+                <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.extraDiurna>0?"#E47911":"#0F1111"}}>
+                  {auto.extraDiurna} h
+                </div>
+              </div>
+              <div style={{background:auto.extraNocturna>0?"#FFF0EF":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.extraNocturna>0?"#B12704":"#DDD")}}>
+                <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>EXTRA NOCTURNA +75%</div>
+                <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.extraNocturna>0?"#B12704":"#0F1111"}}>
+                  {auto.extraNocturna} h
+                </div>
+              </div>
+            </div>
+            <div style={{fontSize:12,color:"#767676",marginTop:8}}>
+              Diurno: 06:00–21:00 &nbsp;|&nbsp; Nocturno: 21:00–06:00 &nbsp;|&nbsp; Jornada estandar: 8 h/dia
+            </div>
+          </div>
+        )}
+
+        <label className="chk" style={{marginBottom:16}}>
+          <input type="checkbox" checked={f.ausente} onChange={function(e){setF(Object.assign({},f,{ausente:e.target.checked}));}}/>
+          Ausencia no remunerada (descuenta 1 dia de salario)
+        </label>
+        <button className="btn" onClick={agregar}>+ Agregar registro</button>
+      </div>
+
+      <div className="card">
+        <h3>Historial — {nomEmp}</h3>
+        {eEmp.length===0
+          ? <div className="mty" style={{padding:"20px 0"}}><p>Sin registros para este empleado.</p></div>
+          : (
+          <div style={{overflowX:"auto"}}>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Fecha</th><th>Entrada</th><th>Salida</th>
+                  <th style={{textAlign:"right"}}>Total h</th>
+                  <th style={{textAlign:"right"}}>Rec. Noct. +35%</th>
+                  <th style={{textAlign:"right"}}>Extra diurna +25%</th>
+                  <th style={{textAlign:"right"}}>Extra noct. +75%</th>
+                  <th style={{textAlign:"right"}}>Dom/Fest +75%</th>
+                  <th>Estado</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {eEmp.map(function(e){
+                  return (
+                    <tr key={e.id}>
+                      <td style={{fontWeight:500}}>{e.fecha}</td>
+                      <td style={{color:"#007185",fontWeight:600}}>{e.entrada||"—"}</td>
+                      <td style={{color:"#B12704",fontWeight:600}}>{e.salida||"—"}</td>
+                      <td className="nr">{e.horasTrabajadas||"—"}</td>
+                      <td className="nr" style={{color:e.rn>0?"#067D62":"inherit"}}>{e.rn||"—"}</td>
+                      <td className="nr" style={{color:e.hed>0?"#E47911":"inherit"}}>{e.hed||"—"}</td>
+                      <td className="nr" style={{color:e.hen>0?"#B12704":"inherit"}}>{e.hen||"—"}</td>
+                      <td className="nr">{e.df||"—"}</td>
+                      <td>{e.ausente?<span className="bdg wn">Ausente</span>:<span className="bdg ok">Presente</span>}</td>
+                      <td>
+                        <button className="btn dng sm" onClick={function(){
+                          setEnts(function(prev){return prev.filter(function(x){return x.id!==e.id;});});
+                        }}>Quitar</button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+function TabGuia() {
+  var pasos=[
+    {n:1,t:"Configura tu empresa",d:"En Empleados, revisa el aviso y marca la casilla de exoneracion Ley 1607 solo si tu contador lo confirma."},
+    {n:2,t:"Registra empleados",d:"Agrega cada empleado con nombre, cedula, salario mensual y clase de riesgo ARL."},
+    {n:3,t:"Registra novedades durante el mes",d:"Cada vez que haya horas extra, recargos nocturnos, trabajo dominical/festivo o ausencias, registralas en Registro de horas. No necesitas registrar dias normales."},
+    {n:4,t:"Liquida al final del mes",d:"En Liquidar nomina elige el mes y revisa el detalle de cada empleado: devengado, deducciones, neto a pagar y costo total empleador."},
+    {n:5,t:"Descarga tu respaldo",d:"Despues de cada liquidacion ve a Respaldo y descarga el archivo .json. Subelo a Google Drive como copia de seguridad."},
+  ];
+  var params=[["SMMLV","$1.750.905"],["Auxilio transporte","$249.095"],["UVT","$52.374"],["Divisor hora","240 h/mes"],["Salud total","12.5% IBC"],["Pension total","16% IBC"],["Cesantias","8.33%/mes"],["Prima","8.33%/mes"],["Vacaciones","4.17%/mes"]];
+  return (
+    <div>
+      <div className="card">
+        <h3>Como usar el liquidador</h3>
+        {pasos.map(function(p){
+          return (
+            <div className="step" key={p.n}>
+              <div className="snum">{p.n}</div>
+              <div><h4>{p.t}</h4><p>{p.d}</p></div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="card">
+        <h3>Parametros normativos 2026</h3>
+        <div className="pgrid">
+          {params.map(function(item){
+            return (
+              <div key={item[0]} className="pitem">
+                <div className="pk">{item[0]}</div>
+                <div className="pv">{item[1]}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="alr or">
+        <strong>Aviso legal:</strong> Este sistema aplica las reglas generales del CST y normativa 2026. No reemplaza la revision de un contador o abogado laboral para casos especiales (salario integral, incapacidades, licencias, convenciones colectivas).
+      </div>
+    </div>
+  );
+}
+
+/* ====================================================
+   LOGIN - Credenciales: wilber1981 / admin123
+   ==================================================== */
+
+var VALID_USER = "wilber1981";
+var VALID_PASS = "admin123";
+var SESSION_KEY = "nomina-session-2026";
+
+var cssLogin = `
+.login-bg{min-height:100vh;background:#EAEDED;display:flex;flex-direction:column;}
+.login-hdr{background:#131921;width:100%;padding:0 24px;height:60px;display:flex;align-items:center;flex-shrink:0;}
+.login-logo{display:flex;align-items:center;gap:10px;}
+.login-logo-ic{width:36px;height:36px;background:#FF9900;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#131921;}
+.login-logo-tx{color:#fff;font-size:17px;font-weight:700;}
+.login-logo-tx span{color:#FF9900;}
+.login-center{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-box{background:#fff;border:1px solid #DDD;border-radius:8px;padding:28px 28px 24px;width:100%;max-width:360px;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.login-title{font-size:20px;font-weight:700;margin-bottom:6px;color:#0F1111;}
+.login-sub{font-size:13px;color:#565959;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #DDD;}
+.login-fld{margin-bottom:14px;}
+.login-fld label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#0F1111;}
+.login-fld input{width:100%;font-family:'Inter',Arial,sans-serif;font-size:14px;padding:9px 12px;border:1px solid #999;border-radius:6px;background:#fff;color:#0F1111;outline:none;}
+.login-fld input:focus{border-color:#FF9900;box-shadow:0 0 0 3px rgba(255,153,0,.25);}
+.login-btn{width:100%;font-family:'Inter',Arial,sans-serif;font-size:14px;font-weight:600;padding:10px;border-radius:20px;border:1px solid #E47911;background:linear-gradient(to bottom,#FFD814,#FF9900);color:#0F1111;cursor:pointer;margin-top:6px;}
+.login-btn:hover{background:linear-gradient(to bottom,#F7CA00,#E47911);}
+.login-err{background:#FFF0EF;border:1px solid #B12704;border-radius:6px;color:#B12704;font-size:13px;padding:10px 12px;margin-bottom:14px;text-align:center;}
+.login-footer{text-align:center;margin-top:14px;font-size:11.5px;color:#767676;}
+`;
+
+function LoginScreen(props) {
+  var onLogin = props.onLogin;
+  var _u = useState(""); var user=_u[0], setUser=_u[1];
+  var _p = useState(""); var pass=_p[0], setPass=_p[1];
+  var _e = useState(""); var err=_e[0], setErr=_e[1];
+
+  function handleSubmit(ev) {
+    ev.preventDefault();
+    if (!user.trim() || !pass.trim()) { setErr("Ingresa usuario y contrasena."); return; }
+    if (user.trim() === VALID_USER && pass === VALID_PASS) {
+      sessionStorage.setItem(SESSION_KEY, "ok");
+      onLogin();
+    } else {
+      setErr("Usuario o contrasena incorrectos.");
+      setPass("");
+    }
+  }
+
+  return (
+    <div className="login-bg">
+      <style>{cssLogin}</style>
+      <header className="login-hdr">
+        <div className="login-logo">
+          <div className="login-logo-ic">N</div>
+          <div className="login-logo-tx">Nomina<span>Colombia</span></div>
+        </div>
+      </header>
+      <div className="login-center">
+        <div className="login-box">
+          <div className="login-title">Iniciar sesion</div>
+          <div className="login-sub">Liquidador de Nomina Colombia 2026</div>
+          {err && <div className="login-err">{err}</div>}
+          <form onSubmit={handleSubmit}>
+            <div className="login-fld">
+              <label>Usuario</label>
+              <input type="text" value={user} onChange={function(e){setUser(e.target.value);}} placeholder="Ingresa tu usuario" autoComplete="username"/>
+            </div>
+            <div className="login-fld">
+              <label>Contrasena</label>
+              <input type="password" value={pass} onChange={function(e){setPass(e.target.value);}} placeholder="Ingresa tu contrasena" autoComplete="current-password"/>
+            </div>
+            <button type="submit" className="login-btn">Ingresar</button>
+          </form>
+          <div className="login-footer">Acceso restringido. Solo usuarios autorizados.</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Root() {
+  var _s = useState(sessionStorage.getItem(SESSION_KEY) === "ok");
+  var loggedIn = _s[0], setLoggedIn = _s[1];
+  if (!loggedIn) {
+    return <LoginScreen onLogin={function(){ setLoggedIn(true); }}/>;
+  }
+  return <App/>;
+}
+
+var root=ReactDOM.createRoot(document.getElementById("root"));
+root.render(<Root/>);
+</script>
+</body>
+</html>
