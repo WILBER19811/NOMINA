@@ -301,12 +301,12 @@ function TabEmpleados(props) {
    Normativa colombiana (CST):
    - Diurno: 06:00 - 19:00
    - Nocturno: 19:00 - 06:00  (+35% recargo ordinario)
-   - Extra diurna: horas sobre 8h en horario diurno (+25%)
-   - Extra nocturna: horas sobre 8h en horario nocturno (+75%)
+   - Extra diurna: horas sobre 7h en horario diurno (+25%)
+   - Extra nocturna: horas sobre 7h en horario nocturno (+75%)
    ============================================================ */
 var INICIO_NOC = 19 * 60; // 1260 min
 var FIN_NOC    =  6 * 60; // 360 min
-var JORNADA_STD = 8 * 60; // 480 min
+var JORNADA_STD = 7 * 60; // 420 min
 
 function toMin(hora) {
   var p = hora.split(":"); return parseInt(p[0])*60 + parseInt(p[1]);
@@ -457,7 +457,7 @@ function TabHoras(props) {
               </div>
             </div>
             <div style={{fontSize:12,color:"#767676",marginTop:8}}>
-              Diurno: 06:00–19:00 &nbsp;|&nbsp; Nocturno: 19:00–06:00 &nbsp;|&nbsp; Jornada estandar: 8 h/dia
+              Diurno: 06:00–19:00 &nbsp;|&nbsp; Nocturno: 19:00–06:00 &nbsp;|&nbsp; Jornada estandar: 7 h/dia
             </div>
           </div>
         )}
