@@ -98,15 +98,22 @@ function uid() { return Math.random().toString(36).slice(2,10); }
 const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
                "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
+// FUNCION ACTUALIZADA CON FACTORES DE LA IMAGEN
 function calcular(emp, entradasMes, exonerada) {
   const sal = Number(emp.salario) || 0;
   const vh  = sal / DIV_H;
   let ed=0, en=0, rn=0, df=0, ausencias=0;
   entradasMes.forEach(function(e) {
-    ed += (e.hed||0) * vh * 1.25;
-    en += (e.hen||0) * vh * 1.75;
-    rn += (e.rn ||0) * vh * 0.35;
-    df += (e.df ||0) * vh * 0.75;
+    // Dias ordinarios
+    rn += (e.rn ||0) * vh * 0.35; // Recargo nocturno (0.35)
+    ed += (e.hed||0) * vh * 1.25; // Extra diurna (1.25)
+    en += (e.hen||0) * vh * 1.75; // Extra nocturna (1.75)
+    // Dominicales y festivos
+    df += (e.hdf||0) * vh * 1.90;   // Dom. ordinaria (1.90)
+    df += (e.hndf||0) * vh * 2.25;  // Nocturna dom. (2.25)
+    df += (e.heddf||0) * vh * 2.15; // Extra diurna dom. (2.15)
+    df += (e.hendf||0) * vh * 2.65; // Extra nocturna dom. (2.65)
+    
     if (e.ausente) ausencias++;
   });
   var descAus = ausencias * (sal/30);
@@ -300,9 +307,8 @@ function TabEmpleados(props) {
    DETECCION AUTOMATICA DE RECARGOS NOCTURNOS Y HORAS EXTRA
    Normativa colombiana (CST):
    - Diurno: 06:00 - 19:00
-   - Nocturno: 19:00 - 06:00  (+35% recargo ordinario)
-   - Extra diurna: horas sobre 7h en horario diurno (+25%)
-   - Extra nocturna: horas sobre 7h en horario nocturno (+75%)
+   - Nocturno: 19:00 - 06:00 
+   - Jornada reducida 2026: 7 horas/dia
    ============================================================ */
 var INICIO_NOC = 19 * 60; // 1260 min
 var FIN_NOC    =  6 * 60; // 360 min
@@ -327,8 +333,6 @@ function calcularNovedades(entrada, salida) {
   var totalMin = minS - minE;
   if (totalMin <= 0) return null;
 
-  // Clasificar cada minuto: ordinario diurno, ordinario nocturno,
-  // extra diurno, extra nocturno
   var stdAcum = 0;
   var ordDiur = 0, ordNoc = 0, extDiur = 0, extNoc = 0;
 
@@ -343,11 +347,11 @@ function calcularNovedades(entrada, salida) {
   }
 
   return {
-    totalHoras:     redondear2(totalMin / 60),
-    recargoNocturno: redondear2(ordNoc  / 60),
-    extraDiurna:     redondear2(extDiur / 60),
-    extraNocturna:   redondear2(extNoc  / 60),
-    horasOrdinarias: redondear2((ordDiur + ordNoc) / 60),
+    totalHoras: redondear2(totalMin / 60),
+    ordDiur:    redondear2(ordDiur / 60),
+    ordNoc:     redondear2(ordNoc  / 60),
+    extDiur:    redondear2(extDiur / 60),
+    extNoc:     redondear2(extNoc  / 60),
   };
 }
 
@@ -355,7 +359,7 @@ function TabHoras(props) {
   var emps=props.emps, ents=props.ents, setEnts=props.setEnts;
   var hoy=new Date().toISOString().slice(0,10);
   var _id=useState(emps[0]?emps[0].id:""); var empId=_id[0], setEmpId=_id[1];
-  var _f=useState({fecha:hoy,entrada:"",salida:"",df:"",ausente:false});
+  var _f=useState({fecha:hoy,entrada:"",salida:"",ausente:false,esFestivo:false});
   var f=_f[0], setF=_f[1];
   useEffect(function(){ if(!empId&&emps[0]) setEmpId(emps[0].id); }, [emps]);
 
@@ -364,25 +368,28 @@ function TabHoras(props) {
     <p>Primero agrega empleados en la pestana <strong>Empleados</strong>.</p></div>
   );
 
-  // Calcular novedades automaticamente
   var auto = calcularNovedades(f.entrada, f.salida);
 
   function agregar() {
     if (!empId) return;
-    var hed = auto ? auto.extraDiurna  : 0;
-    var hen = auto ? auto.extraNocturna: 0;
-    var rn  = auto ? auto.recargoNocturno : 0;
+    var isFest = f.esFestivo;
     setEnts(function(prev){
       return prev.concat([{
         id: uid(), empleadoId: empId, fecha: f.fecha,
         entrada: f.entrada, salida: f.salida,
         horasTrabajadas: auto ? auto.totalHoras : 0,
-        hed: hed, hen: hen, rn: rn,
-        df: Number(f.df)||0,
-        ausente: f.ausente
+        rn:  isFest ? 0 : (auto ? auto.ordNoc : 0),
+        hed: isFest ? 0 : (auto ? auto.extDiur : 0),
+        hen: isFest ? 0 : (auto ? auto.extNoc : 0),
+        hdf:   isFest ? (auto ? auto.ordDiur : 0) : 0,
+        hndf:  isFest ? (auto ? auto.ordNoc : 0)  : 0,
+        heddf: isFest ? (auto ? auto.extDiur : 0) : 0,
+        hendf: isFest ? (auto ? auto.extNoc : 0)  : 0,
+        ausente: f.ausente,
+        esFestivo: isFest
       }]);
     });
-    setF(Object.assign({},f,{entrada:"",salida:"",df:"",ausente:false}));
+    setF(Object.assign({},f,{entrada:"",salida:"",ausente:false,esFestivo:false}));
   }
 
   var eEmp=ents.filter(function(e){return e.empleadoId===empId;})
@@ -416,45 +423,63 @@ function TabHoras(props) {
             <label>Hora de salida</label>
             <input type="time" value={f.salida} onChange={function(e){setF(Object.assign({},f,{salida:e.target.value}));}}/>
           </div>
-          <div className="fld">
-            <label>H. dominical/festivo <span style={{color:"#067D62",fontWeight:700}}>+75%</span></label>
-            <input type="number" min="0" step="0.5" value={f.df}
-              onChange={function(e){setF(Object.assign({},f,{df:e.target.value}));}} placeholder="0"/>
+          <div className="fld" style={{justifyContent:"center"}}>
+            <label className="chk">
+              <input type="checkbox" checked={f.esFestivo} onChange={function(e){setF(Object.assign({},f,{esFestivo:e.target.checked}));}}/>
+              <span style={{color:"#007185",fontWeight:700}}>Es Domingo o Festivo</span>
+            </label>
           </div>
         </div>
 
         {auto && (
           <div style={{background:"#F0F2F2",borderRadius:8,padding:"14px 18px",marginBottom:16,border:"1px solid #DDD"}}>
             <div style={{fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:".5px",color:"#565959",marginBottom:10}}>
-              Calculo automatico segun normativa colombiana
+              Calculo automatico {f.esFestivo ? "(Dominical / Festivo)" : "(Dia Ordinario)"}
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:10}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10}}>
               <div style={{background:"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid #DDD"}}>
                 <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>TOTAL TRABAJADO</div>
                 <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace"}}>{auto.totalHoras} h</div>
               </div>
-              <div style={{background:"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid #DDD"}}>
-                <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>H. ORDINARIAS</div>
-                <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace"}}>{auto.horasOrdinarias} h</div>
-              </div>
-              <div style={{background: auto.recargoNocturno>0?"#EAF7F4":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.recargoNocturno>0?"#067D62":"#DDD")}}>
-                <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>REC. NOCTURNO +35%</div>
-                <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.recargoNocturno>0?"#067D62":"#0F1111"}}>
-                  {auto.recargoNocturno} h
-                </div>
-              </div>
-              <div style={{background:auto.extraDiurna>0?"#FFF3E0":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.extraDiurna>0?"#FF9900":"#DDD")}}>
-                <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>EXTRA DIURNA +25%</div>
-                <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.extraDiurna>0?"#E47911":"#0F1111"}}>
-                  {auto.extraDiurna} h
-                </div>
-              </div>
-              <div style={{background:auto.extraNocturna>0?"#FFF0EF":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.extraNocturna>0?"#B12704":"#DDD")}}>
-                <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>EXTRA NOCTURNA +75%</div>
-                <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.extraNocturna>0?"#B12704":"#0F1111"}}>
-                  {auto.extraNocturna} h
-                </div>
-              </div>
+              {!f.esFestivo ? (
+                <React.Fragment>
+                  <div style={{background:"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid #DDD"}}>
+                    <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>ORDINARIAS (1.0)</div>
+                    <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace"}}>{auto.ordDiur} h</div>
+                  </div>
+                  <div style={{background:auto.ordNoc>0?"#EAF7F4":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.ordNoc>0?"#067D62":"#DDD")}}>
+                    <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>REC. NOCTURNO (0.35)</div>
+                    <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.ordNoc>0?"#067D62":"#0F1111"}}>{auto.ordNoc} h</div>
+                  </div>
+                  <div style={{background:auto.extDiur>0?"#FFF3E0":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.extDiur>0?"#FF9900":"#DDD")}}>
+                    <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>EXTRA DIURNA (1.25)</div>
+                    <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.extDiur>0?"#E47911":"#0F1111"}}>{auto.extDiur} h</div>
+                  </div>
+                  <div style={{background:auto.extNoc>0?"#FFF0EF":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.extNoc>0?"#B12704":"#DDD")}}>
+                    <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>EXTRA NOCT. (1.75)</div>
+                    <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.extNoc>0?"#B12704":"#0F1111"}}>{auto.extNoc} h</div>
+                  </div>
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <div style={{background:auto.ordDiur>0?"#EAF4F4":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.ordDiur>0?"#007185":"#DDD")}}>
+                    <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>DOM. ORDINARIA (1.90)</div>
+                    <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.ordDiur>0?"#007185":"#0F1111"}}>{auto.ordDiur} h</div>
+                  </div>
+                  <div style={{background:auto.ordNoc>0?"#EAF4F4":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.ordNoc>0?"#007185":"#DDD")}}>
+                    <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>NOCTURNA DOM. (2.25)</div>
+                    <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.ordNoc>0?"#007185":"#0F1111"}}>{auto.ordNoc} h</div>
+                  </div>
+                  <div style={{background:auto.extDiur>0?"#EAF4F4":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.extDiur>0?"#007185":"#DDD")}}>
+                    <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>E. DIURNA DOM. (2.15)</div>
+                    <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.extDiur>0?"#007185":"#0F1111"}}>{auto.extDiur} h</div>
+                  </div>
+                  <div style={{background:auto.extNoc>0?"#EAF4F4":"#fff",borderRadius:6,padding:"10px 14px",border:"1px solid "+(auto.extNoc>0?"#007185":"#DDD")}}>
+                    <div style={{fontSize:11,color:"#565959",fontWeight:600,marginBottom:3}}>E. NOCT. DOM. (2.65)</div>
+                    <div style={{fontSize:20,fontWeight:700,fontFamily:"'Courier New',monospace",color:auto.extNoc>0?"#007185":"#0F1111"}}>{auto.extNoc} h</div>
+                  </div>
+                </React.Fragment>
+              )}
             </div>
             <div style={{fontSize:12,color:"#767676",marginTop:8}}>
               Diurno: 06:00–19:00 &nbsp;|&nbsp; Nocturno: 19:00–06:00 &nbsp;|&nbsp; Jornada estandar: 7 h/dia
@@ -478,13 +503,16 @@ function TabHoras(props) {
             <table className="tbl">
               <thead>
                 <tr>
-                  <th>Fecha</th><th>Entrada</th><th>Salida</th>
+                  <th>Fecha</th><th>Ent/Sal</th>
                   <th style={{textAlign:"right"}}>Total h</th>
-                  <th style={{textAlign:"right"}}>Rec. Noct. +35%</th>
-                  <th style={{textAlign:"right"}}>Extra diurna +25%</th>
-                  <th style={{textAlign:"right"}}>Extra noct. +75%</th>
-                  <th style={{textAlign:"right"}}>Dom/Fest +75%</th>
-                  <th>Estado</th><th></th>
+                  <th style={{textAlign:"right"}}>R.Noc<br/><small>0.35</small></th>
+                  <th style={{textAlign:"right"}}>E.Diu<br/><small>1.25</small></th>
+                  <th style={{textAlign:"right"}}>E.Noc<br/><small>1.75</small></th>
+                  <th style={{textAlign:"right",color:"#007185"}}>Dom.Ord<br/><small>1.90</small></th>
+                  <th style={{textAlign:"right",color:"#007185"}}>Dom.Noc<br/><small>2.25</small></th>
+                  <th style={{textAlign:"right",color:"#007185"}}>E.D.Dom<br/><small>2.15</small></th>
+                  <th style={{textAlign:"right",color:"#007185"}}>E.N.Dom<br/><small>2.65</small></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -492,14 +520,15 @@ function TabHoras(props) {
                   return (
                     <tr key={e.id}>
                       <td style={{fontWeight:500}}>{e.fecha}</td>
-                      <td style={{color:"#007185",fontWeight:600}}>{e.entrada||"—"}</td>
-                      <td style={{color:"#B12704",fontWeight:600}}>{e.salida||"—"}</td>
+                      <td style={{color:"#565959"}}>{e.entrada||"—"} / {e.salida||"—"}</td>
                       <td className="nr">{e.horasTrabajadas||"—"}</td>
                       <td className="nr" style={{color:e.rn>0?"#067D62":"inherit"}}>{e.rn||"—"}</td>
                       <td className="nr" style={{color:e.hed>0?"#E47911":"inherit"}}>{e.hed||"—"}</td>
                       <td className="nr" style={{color:e.hen>0?"#B12704":"inherit"}}>{e.hen||"—"}</td>
-                      <td className="nr">{e.df||"—"}</td>
-                      <td>{e.ausente?<span className="bdg wn">Ausente</span>:<span className="bdg ok">Presente</span>}</td>
+                      <td className="nr" style={{color:e.hdf>0?"#007185":"inherit"}}>{e.hdf||"—"}</td>
+                      <td className="nr" style={{color:e.hndf>0?"#007185":"inherit"}}>{e.hndf||"—"}</td>
+                      <td className="nr" style={{color:e.heddf>0?"#007185":"inherit"}}>{e.heddf||"—"}</td>
+                      <td className="nr" style={{color:e.hendf>0?"#007185":"inherit"}}>{e.hendf||"—"}</td>
                       <td>
                         <button className="btn dng sm" onClick={function(){
                           setEnts(function(prev){return prev.filter(function(x){return x.id!==e.id;});});
@@ -516,15 +545,61 @@ function TabHoras(props) {
     </div>
   );
 }
+
+function TabLiq(props) {
+  var emps=props.emps, ents=props.ents, xon=props.xon;
+  var _m=useState(new Date().getMonth()); var mes=_m[0], setMes=_m[1];
+  if(emps.length===0) return <div className="mty"><div className="mi">&#128181;</div><p>Agrega empleados para liquidar.</p></div>;
+  return (
+    <div>
+      <div className="card">
+        <h3>Liquidacion Mensual</h3>
+        <select value={mes} onChange={function(e){setMes(parseInt(e.target.value));}} style={{marginBottom:20, padding:"8px", borderRadius:"6px"}}>
+          {MESES.map(function(m,i){return <option key={i} value={i}>{m}</option>;})}
+        </select>
+        {emps.map(function(e) {
+          var eMes = ents.filter(function(x){return parseInt(x.fecha.split("-")[1],10)-1 === mes && x.empleadoId === e.id;});
+          var liq = calcular(e, eMes, xon);
+          return (
+            <div key={e.id} style={{border:"1px solid #DDD", padding:16, marginBottom:16, borderRadius:8, background:"#F9FAFA"}}>
+              <h4 style={{fontSize:16, marginBottom:10}}>{e.nombre} - Neto a Pagar: <span style={{color:"#067D62"}}>{fmt(liq.neto)}</span></h4>
+              <div style={{fontSize:13, color:"#565959", display:"grid", gridTemplateColumns:"1fr 1fr", gap:10}}>
+                <div><strong>Salario Base:</strong> {fmt(liq.sal)}</div>
+                <div><strong>Aux. Transporte:</strong> {fmt(liq.auxT)}</div>
+                <div><strong>Devengo Extras/Recargos:</strong> {fmt(liq.ed+liq.en+liq.rn+liq.df)}</div>
+                <div><strong>Costo Total Empresa:</strong> {fmt(liq.costoTotal)}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function TabResp(props) {
+  return (
+    <div className="card">
+      <h3>Respaldo de Datos</h3>
+      <p style={{marginBottom:20}}>Exporta o importa tus datos de nomina en formato JSON para mantener una copia de seguridad.</p>
+      <div style={{display:"flex",gap:10}}>
+        <button className="btn" onClick={props.onExp}>Exportar Datos</button>
+        <label className="btn sec" style={{cursor:"pointer", display:"flex", alignItems:"center"}}>
+          Importar Datos
+          <input type="file" accept=".json" style={{display:"none"}} onChange={props.onImp}/>
+        </label>
+      </div>
+    </div>
+  );
+}
+
 function TabGuia() {
   var pasos=[
     {n:1,t:"Configura tu empresa",d:"En Empleados, revisa el aviso y marca la casilla de exoneracion Ley 1607 solo si tu contador lo confirma."},
     {n:2,t:"Registra empleados",d:"Agrega cada empleado con nombre, cedula, salario mensual y clase de riesgo ARL."},
-    {n:3,t:"Registra novedades durante el mes",d:"Cada vez que haya horas extra, recargos nocturnos, trabajo dominical/festivo o ausencias, registralas en Registro de horas. No necesitas registrar dias normales."},
-    {n:4,t:"Liquida al final del mes",d:"En Liquidar nomina elige el mes y revisa el detalle de cada empleado: devengado, deducciones, neto a pagar y costo total empleador."},
-    {n:5,t:"Descarga tu respaldo",d:"Despues de cada liquidacion ve a Respaldo y descarga el archivo .json. Subelo a Google Drive como copia de seguridad."},
+    {n:3,t:"Registra novedades",d:"Ingresa las horas de entrada y salida en Registro de Horas. Usa la casilla 'Es Domingo o Festivo' para aplicar los factores de la nueva tabla de forma automatica."},
+    {n:4,t:"Liquida al final del mes",d:"En Liquidar nomina elige el mes y revisa el detalle de cada empleado: neto a pagar y costo total empleador."},
   ];
-  var params=[["SMMLV","$1.750.905"],["Auxilio transporte","$249.095"],["UVT","$52.374"],["Divisor hora","240 h/mes"],["Salud total","12.5% IBC"],["Pension total","16% IBC"],["Cesantias","8.33%/mes"],["Prima","8.33%/mes"],["Vacaciones","4.17%/mes"]];
   return (
     <div>
       <div className="card">
@@ -538,22 +613,6 @@ function TabGuia() {
           );
         })}
       </div>
-      <div className="card">
-        <h3>Parametros normativos 2026</h3>
-        <div className="pgrid">
-          {params.map(function(item){
-            return (
-              <div key={item[0]} className="pitem">
-                <div className="pk">{item[0]}</div>
-                <div className="pv">{item[1]}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      <div className="alr or">
-        <strong>Aviso legal:</strong> Este sistema aplica las reglas generales del CST y normativa 2026. No reemplaza la revision de un contador o abogado laboral para casos especiales (salario integral, incapacidades, licencias, convenciones colectivas).
-      </div>
     </div>
   );
 }
@@ -561,7 +620,6 @@ function TabGuia() {
 /* ====================================================
    LOGIN - Credenciales: wilber1981 / admin123
    ==================================================== */
-
 var VALID_USER = "wilber1981";
 var VALID_PASS = "admin123";
 var SESSION_KEY = "nomina-session-2026";
