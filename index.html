@@ -359,7 +359,8 @@ function TabHoras(props) {
   var emps=props.emps, ents=props.ents, setEnts=props.setEnts;
   var hoy=new Date().toISOString().slice(0,10);
   var _id=useState(emps[0]?emps[0].id:""); var empId=_id[0], setEmpId=_id[1];
-  var _f=useState({fecha:hoy,entrada:"",salida:"",ausente:false,esFestivo:false});
+  // SE AGREGO EL CAMPO "notas" AL ESTADO INICIAL DEL FORMULARIO
+  var _f=useState({fecha:hoy,entrada:"",salida:"",ausente:false,esFestivo:false, notas:""});
   var f=_f[0], setF=_f[1];
   useEffect(function(){ if(!empId&&emps[0]) setEmpId(emps[0].id); }, [emps]);
 
@@ -386,10 +387,12 @@ function TabHoras(props) {
         heddf: isFest ? (auto ? auto.extDiur : 0) : 0,
         hendf: isFest ? (auto ? auto.extNoc : 0)  : 0,
         ausente: f.ausente,
-        esFestivo: isFest
+        esFestivo: isFest,
+        notas: f.notas // SE GUARDA LA NOTA
       }]);
     });
-    setF(Object.assign({},f,{entrada:"",salida:"",ausente:false,esFestivo:false}));
+    // SE RESETEA EL FORMULARIO INCLUYENDO LAS NOTAS
+    setF(Object.assign({},f,{entrada:"",salida:"",ausente:false,esFestivo:false, notas:""}));
   }
 
   var eEmp=ents.filter(function(e){return e.empleadoId===empId;})
@@ -428,6 +431,14 @@ function TabHoras(props) {
               <input type="checkbox" checked={f.esFestivo} onChange={function(e){setF(Object.assign({},f,{esFestivo:e.target.checked}));}}/>
               <span style={{color:"#007185",fontWeight:700}}>Es Domingo o Festivo</span>
             </label>
+          </div>
+        </div>
+        
+        {/* NUEVO CAMPO DE NOTAS AQUI */}
+        <div className="row">
+          <div className="fld" style={{flex: "1 1 100%"}}>
+            <label>Notas / Observaciones (Opcional)</label>
+            <input type="text" value={f.notas} onChange={function(e){setF(Object.assign({},f,{notas:e.target.value}));}} placeholder="Ej. Calamidad domestica, permiso personal, cita medica..."/>
           </div>
         </div>
 
@@ -512,6 +523,8 @@ function TabHoras(props) {
                   <th style={{textAlign:"right",color:"#007185"}}>Dom.Noc<br/><small>2.25</small></th>
                   <th style={{textAlign:"right",color:"#007185"}}>E.D.Dom<br/><small>2.15</small></th>
                   <th style={{textAlign:"right",color:"#007185"}}>E.N.Dom<br/><small>2.65</small></th>
+                  {/* SE AGREGO EL ENCABEZADO DE NOTAS */}
+                  <th>Notas</th>
                   <th></th>
                 </tr>
               </thead>
@@ -529,6 +542,8 @@ function TabHoras(props) {
                       <td className="nr" style={{color:e.hndf>0?"#007185":"inherit"}}>{e.hndf||"—"}</td>
                       <td className="nr" style={{color:e.heddf>0?"#007185":"inherit"}}>{e.heddf||"—"}</td>
                       <td className="nr" style={{color:e.hendf>0?"#007185":"inherit"}}>{e.hendf||"—"}</td>
+                      {/* SE AGREGO LA COLUMNA DE NOTAS CON ESTILOS PARA NO DESARMAR LA TABLA */}
+                      <td style={{fontSize: 12, color: "#565959", maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}} title={e.notas}>{e.notas || "—"}</td>
                       <td>
                         <button className="btn dng sm" onClick={function(){
                           setEnts(function(prev){return prev.filter(function(x){return x.id!==e.id;});});
